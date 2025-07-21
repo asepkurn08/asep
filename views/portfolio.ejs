@@ -1,0 +1,330 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Portfolio - InvestHub</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link href="/css/main.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+        <div class="container">
+            <a class="navbar-brand fw-bold" href="/">
+                <i class="fas fa-chart-line me-2"></i>InvestHub
+            </a>
+            
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav me-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="/"><i class="fas fa-home me-1"></i>Dashboard</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link active" href="/portfolio"><i class="fas fa-briefcase me-1"></i>Portfolio</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/market"><i class="fas fa-chart-bar me-1"></i>Market</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/trade"><i class="fas fa-exchange-alt me-1"></i>Trade</a>
+                    </li>
+                </ul>
+                
+                <ul class="navbar-nav">
+                    <% if (user) { %>
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
+                                <i class="fas fa-user me-1"></i><%= user.name %>
+                            </a>
+                            <ul class="dropdown-menu">
+                                <li><a class="dropdown-item" href="/profile">Profile</a></li>
+                                <li><hr class="dropdown-divider"></li>
+                                <li><a class="dropdown-item" href="/logout">Logout</a></li>
+                            </ul>
+                        </li>
+                    <% } else { %>
+                        <li class="nav-item">
+                            <a class="nav-link" href="/login"><i class="fas fa-sign-in-alt me-1"></i>Login</a>
+                        </li>
+                    <% } %>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="container mt-4">
+        <!-- Portfolio Header -->
+        <div class="row mb-4">
+            <div class="col-12">
+                <div class="card bg-gradient-primary text-white">
+                    <div class="card-body">
+                        <div class="row align-items-center">
+                            <div class="col-md-8">
+                                <h2 class="mb-2"><i class="fas fa-briefcase me-2"></i>My Portfolio</h2>
+                                <h3 class="mb-1">$<%= portfolio.totalValue.toLocaleString() %></h3>
+                                <p class="mb-0">
+                                    <span class="badge bg-light text-dark me-2">
+                                        <i class="fas fa-arrow-up me-1"></i>+$<%= portfolio.todayChange.toLocaleString() %> (+<%= portfolio.changePercent %>%)
+                                    </span>
+                                    Today's Performance
+                                </p>
+                            </div>
+                            <div class="col-md-4 text-end">
+                                <div class="btn-group" role="group">
+                                    <button type="button" class="btn btn-light">1D</button>
+                                    <button type="button" class="btn btn-light active">1W</button>
+                                    <button type="button" class="btn btn-light">1M</button>
+                                    <button type="button" class="btn btn-light">1Y</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <!-- Portfolio Chart -->
+            <div class="col-lg-8 mb-4">
+                <div class="card h-100">
+                    <div class="card-header">
+                        <h5 class="mb-0"><i class="fas fa-chart-area me-2"></i>Portfolio Performance</h5>
+                    </div>
+                    <div class="card-body">
+                        <canvas id="portfolioChart" width="400" height="200"></canvas>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Asset Allocation -->
+            <div class="col-lg-4 mb-4">
+                <div class="card h-100">
+                    <div class="card-header">
+                        <h5 class="mb-0"><i class="fas fa-chart-pie me-2"></i>Asset Allocation</h5>
+                    </div>
+                    <div class="card-body">
+                        <canvas id="allocationChart" width="300" height="300"></canvas>
+                        <div class="mt-3">
+                            <% portfolio.investments.forEach((stock, index) => { %>
+                                <div class="d-flex justify-content-between align-items-center mb-2">
+                                    <div>
+                                        <span class="badge" style="background-color: <%= ['#007bff', '#28a745', '#ffc107', '#dc3545', '#6f42c1'][index % 5] %>"></span>
+                                        <small class="ms-2"><%= stock.symbol %></small>
+                                    </div>
+                                    <small><%= ((stock.shares * stock.price / portfolio.totalValue) * 100).toFixed(1) %>%</small>
+                                </div>
+                            <% }); %>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Holdings Table -->
+        <div class="row">
+            <div class="col-12 mb-4">
+                <div class="card">
+                    <div class="card-header d-flex justify-content-between align-items-center">
+                        <h5 class="mb-0"><i class="fas fa-list me-2"></i>Holdings Details</h5>
+                        <div class="btn-group btn-group-sm" role="group">
+                            <button type="button" class="btn btn-outline-primary active">All</button>
+                            <button type="button" class="btn btn-outline-success">Gainers</button>
+                            <button type="button" class="btn btn-outline-danger">Losers</button>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <table class="table table-hover">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th>Symbol</th>
+                                        <th>Company Name</th>
+                                        <th>Shares</th>
+                                        <th>Avg Cost</th>
+                                        <th>Current Price</th>
+                                        <th>Market Value</th>
+                                        <th>Day Change</th>
+                                        <th>Total Return</th>
+                                        <th>Weight</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <% portfolio.investments.forEach(stock => { 
+                                        const marketValue = stock.shares * stock.price;
+                                        const avgCost = stock.price * 0.95; // Simulated avg cost
+                                        const totalReturn = (stock.price - avgCost) * stock.shares;
+                                        const totalReturnPercent = ((stock.price - avgCost) / avgCost) * 100;
+                                        const weight = (marketValue / portfolio.totalValue) * 100;
+                                    %>
+                                        <tr>
+                                            <td>
+                                                <strong><%= stock.symbol %></strong>
+                                            </td>
+                                            <td><%= stock.name %></td>
+                                            <td><%= stock.shares %></td>
+                                            <td>$<%= avgCost.toFixed(2) %></td>
+                                            <td>$<%= stock.price %></td>
+                                            <td>$<%= marketValue.toLocaleString() %></td>
+                                            <td>
+                                                <span class="badge bg-<%= stock.change >= 0 ? 'success' : 'danger' %>">
+                                                    <%= stock.change >= 0 ? '+' : '' %>$<%= stock.change %> (<%= stock.changePercent %>%)
+                                                </span>
+                                            </td>
+                                            <td>
+                                                <span class="<%= totalReturn >= 0 ? 'text-success' : 'text-danger' %>">
+                                                    <%= totalReturn >= 0 ? '+' : '' %>$<%= totalReturn.toFixed(2) %>
+                                                    (<%= totalReturnPercent >= 0 ? '+' : '' %><%= totalReturnPercent.toFixed(2) %>%)
+                                                </span>
+                                            </td>
+                                            <td><%= weight.toFixed(1) %>%</td>
+                                            <td>
+                                                <div class="btn-group btn-group-sm" role="group">
+                                                    <button type="button" class="btn btn-outline-primary" onclick="buyStock('<%= stock.symbol %>')">
+                                                        <i class="fas fa-plus"></i>
+                                                    </button>
+                                                    <button type="button" class="btn btn-outline-danger" onclick="sellStock('<%= stock.symbol %>')">
+                                                        <i class="fas fa-minus"></i>
+                                                    </button>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    <% }); %>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Performance Metrics -->
+        <div class="row">
+            <div class="col-md-3 mb-3">
+                <div class="card text-center">
+                    <div class="card-body">
+                        <h6 class="text-muted">Total Return</h6>
+                        <h4 class="text-success">+$12,450</h4>
+                        <small class="text-muted">+10.95%</small>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3 mb-3">
+                <div class="card text-center">
+                    <div class="card-body">
+                        <h6 class="text-muted">Best Performer</h6>
+                        <h4 class="text-success">TSLA</h4>
+                        <small class="text-muted">+35.2%</small>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3 mb-3">
+                <div class="card text-center">
+                    <div class="card-body">
+                        <h6 class="text-muted">Worst Performer</h6>
+                        <h4 class="text-danger">GOOGL</h4>
+                        <small class="text-muted">-5.1%</small>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3 mb-3">
+                <div class="card text-center">
+                    <div class="card-body">
+                        <h6 class="text-muted">Dividends YTD</h6>
+                        <h4 class="text-info">$1,245</h4>
+                        <small class="text-muted">$104/month avg</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="bg-dark text-white text-center py-4 mt-5">
+        <div class="container">
+            <p class="mb-0">&copy; 2024 InvestHub. Platform investasi modern untuk masa depan yang lebih baik.</p>
+        </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Portfolio Performance Chart
+        const ctx = document.getElementById('portfolioChart').getContext('2d');
+        const portfolioChart = new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
+                datasets: [{
+                    label: 'Portfolio Value',
+                    data: [120000, 121500, 119800, 123200, 125400, 124800, 125420],
+                    borderColor: 'rgb(0, 123, 255)',
+                    backgroundColor: 'rgba(0, 123, 255, 0.1)',
+                    tension: 0.1,
+                    fill: true
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: {
+                        display: false
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: false,
+                        ticks: {
+                            callback: function(value, index, values) {
+                                return '$' + value.toLocaleString();
+                            }
+                        }
+                    }
+                }
+            }
+        });
+
+        // Asset Allocation Chart
+        const allocationCtx = document.getElementById('allocationChart').getContext('2d');
+        const allocationChart = new Chart(allocationCtx, {
+            type: 'doughnut',
+            data: {
+                labels: <%= JSON.stringify(portfolio.investments.map(stock => stock.symbol)) %>,
+                datasets: [{
+                    data: <%= JSON.stringify(portfolio.investments.map(stock => ((stock.shares * stock.price / portfolio.totalValue) * 100).toFixed(1))) %>,
+                    backgroundColor: [
+                        '#007bff',
+                        '#28a745',
+                        '#ffc107',
+                        '#dc3545',
+                        '#6f42c1'
+                    ]
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: {
+                        display: false
+                    }
+                }
+            }
+        });
+
+        function buyStock(symbol) {
+            window.location.href = `/trade?action=buy&symbol=${symbol}`;
+        }
+
+        function sellStock(symbol) {
+            window.location.href = `/trade?action=sell&symbol=${symbol}`;
+        }
+    </script>
+</body>
+</html>
