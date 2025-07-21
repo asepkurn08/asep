@@ -1,0 +1,466 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Market Analysis - InvestHub</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link href="/css/main.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+        <div class="container">
+            <a class="navbar-brand fw-bold" href="/">
+                <i class="fas fa-chart-line me-2"></i>InvestHub
+            </a>
+            
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav me-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="/"><i class="fas fa-home me-1"></i>Dashboard</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/portfolio"><i class="fas fa-briefcase me-1"></i>Portfolio</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link active" href="/market"><i class="fas fa-chart-bar me-1"></i>Market</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/trade"><i class="fas fa-exchange-alt me-1"></i>Trade</a>
+                    </li>
+                </ul>
+                
+                <ul class="navbar-nav">
+                    <% if (user) { %>
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
+                                <i class="fas fa-user me-1"></i><%= user.name %>
+                            </a>
+                            <ul class="dropdown-menu">
+                                <li><a class="dropdown-item" href="/profile">Profile</a></li>
+                                <li><hr class="dropdown-divider"></li>
+                                <li><a class="dropdown-item" href="/logout">Logout</a></li>
+                            </ul>
+                        </li>
+                    <% } else { %>
+                        <li class="nav-item">
+                            <a class="nav-link" href="/login"><i class="fas fa-sign-in-alt me-1"></i>Login</a>
+                        </li>
+                    <% } %>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="container mt-4">
+        <!-- Market Overview -->
+        <div class="row mb-4">
+            <div class="col-12">
+                <div class="card bg-gradient-info text-white">
+                    <div class="card-body">
+                        <h2 class="mb-3"><i class="fas fa-chart-bar me-2"></i>Market Analysis & Research</h2>
+                        <div class="row">
+                            <div class="col-md-3">
+                                <h6>S&P 500</h6>
+                                <h4>4,567.89 <small class="text-success">+1.2%</small></h4>
+                            </div>
+                            <div class="col-md-3">
+                                <h6>NASDAQ</h6>
+                                <h4>14,234.56 <small class="text-success">+0.8%</small></h4>
+                            </div>
+                            <div class="col-md-3">
+                                <h6>DOW JONES</h6>
+                                <h4>35,789.12 <small class="text-danger">-0.3%</small></h4>
+                            </div>
+                            <div class="col-md-3">
+                                <h6>VIX</h6>
+                                <h4>18.45 <small class="text-danger">+2.1%</small></h4>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <!-- Market Chart -->
+            <div class="col-lg-8 mb-4">
+                <div class="card h-100">
+                    <div class="card-header d-flex justify-content-between align-items-center">
+                        <h5 class="mb-0"><i class="fas fa-chart-area me-2"></i>Market Performance</h5>
+                        <div class="btn-group btn-group-sm" role="group">
+                            <button type="button" class="btn btn-outline-primary">1D</button>
+                            <button type="button" class="btn btn-outline-primary active">1W</button>
+                            <button type="button" class="btn btn-outline-primary">1M</button>
+                            <button type="button" class="btn btn-outline-primary">1Y</button>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <canvas id="marketChart" width="400" height="200"></canvas>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Top Movers -->
+            <div class="col-lg-4 mb-4">
+                <div class="card h-100">
+                    <div class="card-header">
+                        <ul class="nav nav-tabs card-header-tabs" id="moversTabs" role="tablist">
+                            <li class="nav-item" role="presentation">
+                                <button class="nav-link active" id="gainers-tab" data-bs-toggle="tab" data-bs-target="#gainers" type="button" role="tab">
+                                    Top Gainers
+                                </button>
+                            </li>
+                            <li class="nav-item" role="presentation">
+                                <button class="nav-link" id="losers-tab" data-bs-toggle="tab" data-bs-target="#losers" type="button" role="tab">
+                                    Top Losers
+                                </button>
+                            </li>
+                        </ul>
+                    </div>
+                    <div class="card-body">
+                        <div class="tab-content" id="moversTabContent">
+                            <div class="tab-pane fade show active" id="gainers" role="tabpanel">
+                                <div class="list-group list-group-flush">
+                                    <div class="list-group-item d-flex justify-content-between align-items-center">
+                                        <div>
+                                            <strong>NVDA</strong>
+                                            <br><small class="text-muted">NVIDIA Corp</small>
+                                        </div>
+                                        <div class="text-end">
+                                            <div class="text-success">+8.45%</div>
+                                            <small>$485.23</small>
+                                        </div>
+                                    </div>
+                                    <div class="list-group-item d-flex justify-content-between align-items-center">
+                                        <div>
+                                            <strong>AMD</strong>
+                                            <br><small class="text-muted">Advanced Micro Devices</small>
+                                        </div>
+                                        <div class="text-end">
+                                            <div class="text-success">+6.78%</div>
+                                            <small>$156.89</small>
+                                        </div>
+                                    </div>
+                                    <div class="list-group-item d-flex justify-content-between align-items-center">
+                                        <div>
+                                            <strong>TSLA</strong>
+                                            <br><small class="text-muted">Tesla Inc</small>
+                                        </div>
+                                        <div class="text-end">
+                                            <div class="text-success">+5.23%</div>
+                                            <small>$248.50</small>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="tab-pane fade" id="losers" role="tabpanel">
+                                <div class="list-group list-group-flush">
+                                    <div class="list-group-item d-flex justify-content-between align-items-center">
+                                        <div>
+                                            <strong>META</strong>
+                                            <br><small class="text-muted">Meta Platforms</small>
+                                        </div>
+                                        <div class="text-end">
+                                            <div class="text-danger">-4.56%</div>
+                                            <small>$278.45</small>
+                                        </div>
+                                    </div>
+                                    <div class="list-group-item d-flex justify-content-between align-items-center">
+                                        <div>
+                                            <strong>NFLX</strong>
+                                            <br><small class="text-muted">Netflix Inc</small>
+                                        </div>
+                                        <div class="text-end">
+                                            <div class="text-danger">-3.21%</div>
+                                            <small>$398.76</small>
+                                        </div>
+                                    </div>
+                                    <div class="list-group-item d-flex justify-content-between align-items-center">
+                                        <div>
+                                            <strong>GOOGL</strong>
+                                            <br><small class="text-muted">Alphabet Inc</small>
+                                        </div>
+                                        <div class="text-end">
+                                            <div class="text-danger">-2.15%</div>
+                                            <small>$142.80</small>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Market News -->
+        <div class="row">
+            <div class="col-lg-8 mb-4">
+                <div class="card">
+                    <div class="card-header d-flex justify-content-between align-items-center">
+                        <h5 class="mb-0"><i class="fas fa-newspaper me-2"></i>Market News & Analysis</h5>
+                        <div class="btn-group btn-group-sm" role="group">
+                            <button type="button" class="btn btn-outline-primary active">All</button>
+                            <button type="button" class="btn btn-outline-primary">Breaking</button>
+                            <button type="button" class="btn btn-outline-primary">Analysis</button>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <% news.forEach((article, index) => { %>
+                            <div class="row mb-3 <% if (index !== news.length - 1) { %>border-bottom pb-3<% } %>">
+                                <div class="col-md-8">
+                                    <h6 class="mb-2"><%= article.title %></h6>
+                                    <p class="text-muted mb-2"><%= article.summary %></p>
+                                    <div class="d-flex">
+                                        <small class="text-primary me-3"><i class="fas fa-newspaper me-1"></i><%= article.source %></small>
+                                        <small class="text-muted"><i class="fas fa-clock me-1"></i><%= article.time %></small>
+                                    </div>
+                                </div>
+                                <div class="col-md-4 text-end">
+                                    <div class="btn-group btn-group-sm" role="group">
+                                        <button type="button" class="btn btn-outline-primary">
+                                            <i class="fas fa-share"></i>
+                                        </button>
+                                        <button type="button" class="btn btn-outline-secondary">
+                                            <i class="fas fa-bookmark"></i>
+                                        </button>
+                                        <button type="button" class="btn btn-outline-info">
+                                            <i class="fas fa-external-link-alt"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        <% }); %>
+                        
+                        <div class="text-center mt-4">
+                            <button class="btn btn-outline-primary">Load More News</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Research Tools -->
+            <div class="col-lg-4 mb-4">
+                <div class="card h-100">
+                    <div class="card-header">
+                        <h5 class="mb-0"><i class="fas fa-search me-2"></i>Research Tools</h5>
+                    </div>
+                    <div class="card-body">
+                        <!-- Stock Screener -->
+                        <div class="mb-4">
+                            <h6 class="mb-3"><i class="fas fa-filter me-2"></i>Stock Screener</h6>
+                            <div class="mb-3">
+                                <label class="form-label">Market Cap</label>
+                                <select class="form-select form-select-sm">
+                                    <option>All</option>
+                                    <option>Large Cap</option>
+                                    <option>Mid Cap</option>
+                                    <option>Small Cap</option>
+                                </select>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Sector</label>
+                                <select class="form-select form-select-sm">
+                                    <option>All Sectors</option>
+                                    <option>Technology</option>
+                                    <option>Healthcare</option>
+                                    <option>Financial</option>
+                                    <option>Energy</option>
+                                </select>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">P/E Ratio</label>
+                                <div class="row">
+                                    <div class="col-6">
+                                        <input type="number" class="form-control form-control-sm" placeholder="Min">
+                                    </div>
+                                    <div class="col-6">
+                                        <input type="number" class="form-control form-control-sm" placeholder="Max">
+                                    </div>
+                                </div>
+                            </div>
+                            <button class="btn btn-primary btn-sm w-100">
+                                <i class="fas fa-search me-1"></i>Screen Stocks
+                            </button>
+                        </div>
+
+                        <!-- Economic Calendar -->
+                        <div class="mb-4">
+                            <h6 class="mb-3"><i class="fas fa-calendar me-2"></i>Economic Calendar</h6>
+                            <div class="list-group list-group-flush">
+                                <div class="list-group-item p-2">
+                                    <div class="d-flex justify-content-between">
+                                        <small><strong>Today</strong></small>
+                                        <span class="badge bg-warning">High</span>
+                                    </div>
+                                    <small class="text-muted">10:00 AM - Consumer Price Index</small>
+                                </div>
+                                <div class="list-group-item p-2">
+                                    <div class="d-flex justify-content-between">
+                                        <small><strong>Tomorrow</strong></small>
+                                        <span class="badge bg-info">Medium</span>
+                                    </div>
+                                    <small class="text-muted">08:30 AM - Jobless Claims</small>
+                                </div>
+                                <div class="list-group-item p-2">
+                                    <div class="d-flex justify-content-between">
+                                        <small><strong>Friday</strong></small>
+                                        <span class="badge bg-danger">High</span>
+                                    </div>
+                                    <small class="text-muted">08:30 AM - Non-Farm Payrolls</small>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Quick Analysis -->
+                        <div>
+                            <h6 class="mb-3"><i class="fas fa-chart-line me-2"></i>Quick Analysis</h6>
+                            <div class="input-group mb-3">
+                                <input type="text" class="form-control form-control-sm" placeholder="Enter symbol (e.g., AAPL)">
+                                <button class="btn btn-outline-primary btn-sm" type="button">
+                                    <i class="fas fa-search"></i>
+                                </button>
+                            </div>
+                            <div class="d-grid gap-2">
+                                <button class="btn btn-outline-secondary btn-sm">
+                                    <i class="fas fa-chart-bar me-1"></i>Technical Analysis
+                                </button>
+                                <button class="btn btn-outline-secondary btn-sm">
+                                    <i class="fas fa-calculator me-1"></i>Fundamental Analysis
+                                </button>
+                                <button class="btn btn-outline-secondary btn-sm">
+                                    <i class="fas fa-users me-1"></i>Analyst Ratings
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Sector Performance -->
+        <div class="row">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="mb-0"><i class="fas fa-industry me-2"></i>Sector Performance</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-3 mb-3">
+                                <div class="card bg-success text-white">
+                                    <div class="card-body text-center">
+                                        <h6>Technology</h6>
+                                        <h4>+2.45%</h4>
+                                        <small>Leading the market</small>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-3 mb-3">
+                                <div class="card bg-success text-white">
+                                    <div class="card-body text-center">
+                                        <h6>Healthcare</h6>
+                                        <h4>+1.78%</h4>
+                                        <small>Strong performance</small>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-3 mb-3">
+                                <div class="card bg-warning text-white">
+                                    <div class="card-body text-center">
+                                        <h6>Financial</h6>
+                                        <h4>+0.34%</h4>
+                                        <small>Mixed signals</small>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-3 mb-3">
+                                <div class="card bg-danger text-white">
+                                    <div class="card-body text-center">
+                                        <h6>Energy</h6>
+                                        <h4>-1.23%</h4>
+                                        <small>Under pressure</small>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="bg-dark text-white text-center py-4 mt-5">
+        <div class="container">
+            <p class="mb-0">&copy; 2024 InvestHub. Platform investasi modern untuk masa depan yang lebih baik.</p>
+        </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Market Performance Chart
+        const ctx = document.getElementById('marketChart').getContext('2d');
+        const marketChart = new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri'],
+                datasets: [
+                    {
+                        label: 'S&P 500',
+                        data: [4520, 4535, 4540, 4560, 4568],
+                        borderColor: 'rgb(54, 162, 235)',
+                        backgroundColor: 'rgba(54, 162, 235, 0.1)',
+                        tension: 0.1
+                    },
+                    {
+                        label: 'NASDAQ',
+                        data: [14100, 14150, 14180, 14220, 14235],
+                        borderColor: 'rgb(255, 99, 132)',
+                        backgroundColor: 'rgba(255, 99, 132, 0.1)',
+                        tension: 0.1
+                    },
+                    {
+                        label: 'DOW',
+                        data: [35600, 35650, 35700, 35750, 35789],
+                        borderColor: 'rgb(75, 192, 192)',
+                        backgroundColor: 'rgba(75, 192, 192, 0.1)',
+                        tension: 0.1
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                interaction: {
+                    intersect: false,
+                },
+                scales: {
+                    y: {
+                        beginAtZero: false,
+                        ticks: {
+                            callback: function(value, index, values) {
+                                return value.toLocaleString();
+                            }
+                        }
+                    }
+                }
+            }
+        });
+
+        // Auto-refresh market data
+        setInterval(function() {
+            // Simulate real-time updates
+            console.log('Updating market data...');
+        }, 30000);
+    </script>
+</body>
+</html>

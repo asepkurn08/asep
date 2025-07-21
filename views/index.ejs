@@ -1,26 +1,248 @@
 <!DOCTYPE html>
-<html>
-  <head>
-    <title>Haikus for Mona</title>
-    <link href="/css/main.css" rel="stylesheet" type="text/css">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta property="og:title" content="Haikus for Mona">
-    <meta property="og:description" content="Some of the best haikus you'll ever read about our rescue dog June">
-    <meta property="og:image" content="/images/sunlight.jpg">
-  </head>
-  <body>
-    <h1>Haikus for Mona</h1>
-    <div>
-      <% for(var i=0; i < haikus.length; i++) { %>
-        <img
-          class="mona-images"
-          src="images/<%= haikus[i].image %>" />
-        <div 
-          class="haiku-containers">
-          <p 
-            class="haikus"
-          ><%- haikus[i].text %></p>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>InvestHub - Investment Dashboard</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link href="/css/main.css" rel="stylesheet">
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+        <div class="container">
+            <a class="navbar-brand fw-bold" href="/">
+                <i class="fas fa-chart-line me-2"></i>InvestHub
+            </a>
+            
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav me-auto">
+                    <li class="nav-item">
+                        <a class="nav-link active" href="/"><i class="fas fa-home me-1"></i>Dashboard</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/portfolio"><i class="fas fa-briefcase me-1"></i>Portfolio</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/market"><i class="fas fa-chart-bar me-1"></i>Market</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/trade"><i class="fas fa-exchange-alt me-1"></i>Trade</a>
+                    </li>
+                </ul>
+                
+                <ul class="navbar-nav">
+                    <% if (user) { %>
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
+                                <i class="fas fa-user me-1"></i><%= user.name %>
+                            </a>
+                            <ul class="dropdown-menu">
+                                <li><a class="dropdown-item" href="/profile">Profile</a></li>
+                                <li><hr class="dropdown-divider"></li>
+                                <li><a class="dropdown-item" href="/logout">Logout</a></li>
+                            </ul>
+                        </li>
+                    <% } else { %>
+                        <li class="nav-item">
+                            <a class="nav-link" href="/login"><i class="fas fa-sign-in-alt me-1"></i>Login</a>
+                        </li>
+                    <% } %>
+                </ul>
+            </div>
         </div>
-      <% } %>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="container mt-4">
+        <!-- Portfolio Summary Cards -->
+        <div class="row mb-4">
+            <div class="col-md-3 mb-3">
+                <div class="card bg-primary text-white h-100">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between">
+                            <div>
+                                <h6 class="card-title mb-1">Total Portfolio</h6>
+                                <h4 class="mb-0">$<%= portfolio.totalValue.toLocaleString() %></h4>
+                            </div>
+                            <div class="align-self-center">
+                                <i class="fas fa-wallet fa-2x opacity-75"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-3 mb-3">
+                <div class="card bg-success text-white h-100">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between">
+                            <div>
+                                <h6 class="card-title mb-1">Today's Change</h6>
+                                <h4 class="mb-0">+$<%= portfolio.todayChange.toLocaleString() %></h4>
+                                <small class="opacity-75">+<%= portfolio.changePercent %>%</small>
+                            </div>
+                            <div class="align-self-center">
+                                <i class="fas fa-arrow-up fa-2x opacity-75"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-3 mb-3">
+                <div class="card bg-info text-white h-100">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between">
+                            <div>
+                                <h6 class="card-title mb-1">Total Holdings</h6>
+                                <h4 class="mb-0"><%= portfolio.investments.length %></h4>
+                                <small class="opacity-75">Stocks</small>
+                            </div>
+                            <div class="align-self-center">
+                                <i class="fas fa-chart-pie fa-2x opacity-75"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-3 mb-3">
+                <div class="card bg-warning text-white h-100">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between">
+                            <div>
+                                <h6 class="card-title mb-1">Best Performer</h6>
+                                <h4 class="mb-0">TSLA</h4>
+                                <small class="opacity-75">+3.44%</small>
+                            </div>
+                            <div class="align-self-center">
+                                <i class="fas fa-trophy fa-2x opacity-75"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <!-- Portfolio Overview -->
+            <div class="col-lg-8 mb-4">
+                <div class="card h-100">
+                    <div class="card-header d-flex justify-content-between align-items-center">
+                        <h5 class="mb-0"><i class="fas fa-briefcase me-2"></i>Portfolio Overview</h5>
+                        <a href="/portfolio" class="btn btn-outline-primary btn-sm">View All</a>
+                    </div>
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <table class="table table-hover">
+                                <thead>
+                                    <tr>
+                                        <th>Symbol</th>
+                                        <th>Company</th>
+                                        <th>Shares</th>
+                                        <th>Price</th>
+                                        <th>Change</th>
+                                        <th>Value</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <% portfolio.investments.slice(0, 5).forEach(stock => { %>
+                                        <tr>
+                                            <td><strong><%= stock.symbol %></strong></td>
+                                            <td><%= stock.name %></td>
+                                            <td><%= stock.shares %></td>
+                                            <td>$<%= stock.price %></td>
+                                            <td>
+                                                <span class="badge bg-<%= stock.change >= 0 ? 'success' : 'danger' %>">
+                                                    <%= stock.change >= 0 ? '+' : '' %><%= stock.change %> (<%= stock.changePercent %>%)
+                                                </span>
+                                            </td>
+                                            <td>$<%= (stock.shares * stock.price).toLocaleString() %></td>
+                                        </tr>
+                                    <% }); %>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Market News -->
+            <div class="col-lg-4 mb-4">
+                <div class="card h-100">
+                    <div class="card-header d-flex justify-content-between align-items-center">
+                        <h5 class="mb-0"><i class="fas fa-newspaper me-2"></i>Market News</h5>
+                        <a href="/market" class="btn btn-outline-primary btn-sm">More News</a>
+                    </div>
+                    <div class="card-body">
+                        <% news.forEach(article => { %>
+                            <div class="mb-3 pb-3 <% if (news.indexOf(article) !== news.length - 1) { %>border-bottom<% } %>">
+                                <h6 class="mb-2"><%= article.title %></h6>
+                                <p class="text-muted small mb-2"><%= article.summary %></p>
+                                <div class="d-flex justify-content-between">
+                                    <small class="text-primary"><%= article.source %></small>
+                                    <small class="text-muted"><%= article.time %></small>
+                                </div>
+                            </div>
+                        <% }); %>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Quick Actions -->
+        <div class="row mt-4">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="mb-0"><i class="fas fa-rocket me-2"></i>Quick Actions</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="row text-center">
+                            <div class="col-md-3 mb-3">
+                                <a href="/trade" class="btn btn-outline-primary btn-lg w-100">
+                                    <i class="fas fa-plus-circle d-block mb-2"></i>
+                                    Buy Stocks
+                                </a>
+                            </div>
+                            <div class="col-md-3 mb-3">
+                                <a href="/trade" class="btn btn-outline-danger btn-lg w-100">
+                                    <i class="fas fa-minus-circle d-block mb-2"></i>
+                                    Sell Stocks
+                                </a>
+                            </div>
+                            <div class="col-md-3 mb-3">
+                                <a href="/portfolio" class="btn btn-outline-info btn-lg w-100">
+                                    <i class="fas fa-chart-area d-block mb-2"></i>
+                                    View Analytics
+                                </a>
+                            </div>
+                            <div class="col-md-3 mb-3">
+                                <a href="/market" class="btn btn-outline-success btn-lg w-100">
+                                    <i class="fas fa-search d-block mb-2"></i>
+                                    Research
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
+
+    <!-- Footer -->
+    <footer class="bg-dark text-white text-center py-4 mt-5">
+        <div class="container">
+            <p class="mb-0">&copy; 2024 InvestHub. Platform investasi modern untuk masa depan yang lebih baik.</p>
+        </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+</body>
 </html>

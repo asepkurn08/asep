@@ -1,17 +1,23 @@
 {
-    "name": "app-service-hello-world",
-    "description": "Simple Hello World Node.js sample for Azure App Service",
-    "version": "0.0.1",
+    "name": "investment-web-app",
+    "description": "Modern Investment Web Application with Portfolio Management",
+    "version": "1.0.0",
     "private": true,
     "license": "MIT",
-    "author": "Microsoft",
+    "author": "Investment App",
     "scripts": {
         "start": "node index.js",
-        "dev": "nodemon"
+        "dev": "nodemon index.js"
     },
     "dependencies": {
         "ejs": "^3.1.10",
-        "express": "^4.21.2"
+        "express": "^4.21.2",
+        "axios": "^1.6.0",
+        "bcryptjs": "^2.4.3",
+        "express-session": "^1.17.3",
+        "body-parser": "^1.20.2",
+        "cors": "^2.8.5",
+        "dotenv": "^16.3.1"
     },
     "devDependencies": {
         "nodemon": "^2.0.19"
